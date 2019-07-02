@@ -37,16 +37,11 @@ public class UserDAOTest {
     }
 
     @Test
-    public void add() throws SQLException {
-        UserDTO dto = new UserDTO(1, "name", "password", false);
-        deleteUser(dto);
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(1985, Calendar.JANUARY, 25, 0, 0, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
-        Date createDate = new Date(calendar.getTime().getTime());
+    public void create() throws SQLException {
+        UserDTO dto = createUser();
+        Date createDate = getDate(1985,3,25);
         String createdBy = "byme";
-        new UserDAO(connection).add(dto, createdBy, createDate);
+        new UserDAO(connection).create(dto, createdBy, createDate);
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT userId,userName,password,active,createDate,createdBy,lastUpdateBy FROM user");
         assertThat(resultSet.next(), is(true));
@@ -62,12 +57,11 @@ public class UserDAOTest {
     }
 
     @Test
-    public void get() throws SQLException {
-        UserDTO dto = new UserDTO(1, "name", "password", false);
-        deleteUser(dto);
+    public void read() throws SQLException {
         UserDAO userDAO = new UserDAO(connection);
-        userDAO.add(dto, "byme", new Date(0));
-        UserDTO actualDTO = userDAO.get(dto.getId());
+        UserDTO dto = createUser();
+        userDAO.create(dto, "byme", getDate(1985,8,2));
+        UserDTO actualDTO = userDAO.read(dto.getId());
         assertThat(actualDTO, notNullValue());
         assertThat(actualDTO.getId(), is(dto.getId()));
         assertThat(actualDTO.getName(), is(dto.getName()));
@@ -77,11 +71,40 @@ public class UserDAOTest {
     }
 
     @Test
-    public void get_userNotFound() throws SQLException {
+    public void read_userNotFound() throws SQLException {
         UserDAO userDAO = new UserDAO(connection);
-        UserDTO actualDTO = userDAO.get(33);
+        UserDTO actualDTO = userDAO.read(33);
         assertThat(actualDTO, nullValue());
     }
+
+    @Test
+    public void update() throws SQLException {
+        UserDAO userDAO = new UserDAO(connection);
+        UserDTO dto = createUser();
+        userDAO.create(dto, "byme", getDate(2016,5,31));
+        UserDTO updateDTO = new UserDTO(dto.getId(),"bythem", "newPW", false);
+        userDAO.update( "bythem", updateDTO);
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT userId,userName,password,active,lastUpdateBy FROM user");
+        assertThat(resultSet.next(), is(true));
+        assertThat(resultSet.getInt("userId"), is(updateDTO.getId()));
+        assertThat(resultSet.getString("userName"), is(updateDTO.getName()));
+        assertThat(resultSet.getString("password"), is(updateDTO.getPassword()));
+        assertThat(resultSet.getBoolean("active"), is(updateDTO.isActive()));
+        assertThat(resultSet.getString("lastUpdateBy"), is("bythem"));
+        statement.close();
+        deleteUser(dto);
+    }
+
+    @Test
+    public void delete() throws SQLException {
+        UserDAO userDAO = new UserDAO(connection);
+        UserDTO dto = createUser();
+        UserDTO deletedDTO = userDAO.read(dto.getId());
+        userDAO.delete(dto.getId());
+        assertThat(deletedDTO, nullValue());
+    }
+
 
     private void deleteUser(UserDTO dto) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("DELETE FROM user WHERE userId = ?");
@@ -90,5 +113,18 @@ public class UserDAOTest {
         statement.close();
     }
 
+    private UserDTO createUser() throws SQLException {
+        UserDTO dto = new UserDTO(1, "name", "password", false);
+        deleteUser(dto);
+        return dto;
+    }
+
+    private Date getDate(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month-1, day, 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return new Date(calendar.getTime().getTime());
+    }
 
 }

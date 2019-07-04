@@ -1,15 +1,13 @@
 package org.branlewalk.dao;
 
+import com.sun.istack.internal.NotNull;
 import org.branlewalk.dto.UserDTO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-
 import java.sql.*;
 import java.util.Calendar;
 import java.util.TimeZone;
-
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -41,7 +39,7 @@ public class UserDAOTest {
         UserDTO dto = createUser();
         Date createDate = getDate(1985,3,25);
         String createdBy = "byme";
-        new UserDAO(connection).create(dto, createdBy, createDate);
+        new UserDaoImpl(connection).create(dto, createdBy, createDate);
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT userId,userName,password,active,createDate,createdBy,lastUpdateBy FROM user");
         assertThat(resultSet.next(), is(true));
@@ -58,7 +56,7 @@ public class UserDAOTest {
 
     @Test
     public void read() throws SQLException {
-        UserDAO userDAO = new UserDAO(connection);
+        UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO dto = createUser();
         userDAO.create(dto, "byme", getDate(1985,8,2));
         UserDTO actualDTO = userDAO.read(dto.getId());
@@ -72,14 +70,14 @@ public class UserDAOTest {
 
     @Test
     public void read_userNotFound() throws SQLException {
-        UserDAO userDAO = new UserDAO(connection);
+        UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO actualDTO = userDAO.read(33);
         assertThat(actualDTO, nullValue());
     }
 
     @Test
     public void update() throws SQLException {
-        UserDAO userDAO = new UserDAO(connection);
+        UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO dto = createUser();
         userDAO.create(dto, "byme", getDate(2016,5,31));
         UserDTO updateDTO = new UserDTO(dto.getId(),"bythem", "newPW", false);
@@ -98,11 +96,15 @@ public class UserDAOTest {
 
     @Test
     public void delete() throws SQLException {
-        UserDAO userDAO = new UserDAO(connection);
+        UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO dto = createUser();
-        UserDTO deletedDTO = userDAO.read(dto.getId());
+        userDAO.create(dto, "byme", getDate(2016,5,31));
+        assertThat(userDAO.read(dto.getId()), notNullValue());
         userDAO.delete(dto.getId());
-        assertThat(deletedDTO, nullValue());
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM user WHERE userId = ?");
+        statement.setInt(1,dto.getId());
+        ResultSet resultSet = statement.executeQuery();
+        assertThat(resultSet.next(), is(false));
     }
 
 

@@ -1,6 +1,8 @@
 package org.branlewalk.dao;
 
 import org.branlewalk.dto.AppointmentDTO;
+import org.branlewalk.dto.CustomerDTO;
+import org.branlewalk.dto.UserDTO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

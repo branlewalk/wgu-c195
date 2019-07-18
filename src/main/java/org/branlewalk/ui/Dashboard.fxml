@@ -23,7 +23,7 @@
                 <RowConstraints prefHeight="40.0" vgrow="NEVER"/>
             </rowConstraints>
             <children>
-                <Button text="Customers" GridPane.columnIndex="0"/>
+                <Button text="Customers" GridPane.columnIndex="0" onAction="#handleCustomersButton"/>
                 <Button text="Reporting" GridPane.columnIndex="1" onAction="#handleReportingButtonAction"/>
                 <Label text="Appointments: " GridPane.columnIndex="3"/>
                 <Button text="New" GridPane.columnIndex="4"/>
@@ -46,8 +46,8 @@
             </rowConstraints>
             <children>
                 <Label text="View:" GridPane.columnIndex="2"/>
-                <Button onAction="#handleWeekViewButton" text="Week" GridPane.columnIndex="3"/>
-                <Button onAction="#handleMonthViewButton" text="Month" GridPane.columnIndex="4"/>
+                <Button text="Week" GridPane.columnIndex="3" onAction="#handleWeekViewButton"/>
+                <Button text="Month" GridPane.columnIndex="4" onAction="#handleMonthViewButton"/>
             </children>
         </GridPane>
     </top>
@@ -58,16 +58,16 @@
                     <HBox fx:id="monthController" alignment="CENTER" prefHeight="23.0" prefWidth="600.0"
                           scaleShape="false">
                         <children>
-                            <Button onAction="#handlePreviousMonthButton" contentDisplay="TEXT_ONLY" scaleX="0.5"
+                            <Button contentDisplay="TEXT_ONLY" scaleX="0.5" onAction="#handlePreviousMonthButton"
                                     scaleY="0.5" text="&lt;&lt;"/>
-                            <Label fx:id="monthYearLabel" alignment="CENTER" minWidth="250" contentDisplay="CENTER" text="MonthYear">
+                            <Label fx:id="monthYearLabel" alignment="CENTER" minWidth="250" contentDisplay="CENTER"
+                                   text="MonthYear">
                                 <padding>
                                     <Insets left="20.0" right="20.0"/>
                                 </padding>
                             </Label>
-                            <Button onAction="#handleNextMonthButton" contentDisplay="TEXT_ONLY" scaleX="0.5"
-                                    scaleY="0.5"
-                                    text="&gt;&gt;"/>
+                            <Button contentDisplay="TEXT_ONLY" scaleX="0.5" onAction="#handleNextMonthButton"
+                                    scaleY="0.5" text="&gt;&gt;"/>
                         </children>
                     </HBox>
                     <HBox fx:id="weekController" alignment="CENTER" prefHeight="23.0" prefWidth="600.0"
@@ -75,7 +75,8 @@
                         <children>
                             <Button onAction="#handlePreviousWeekButton" contentDisplay="TEXT_ONLY" scaleX="0.5"
                                     scaleY="0.5" text="&lt;&lt;"/>
-                            <Label fx:id="weekMonthLabel" alignment="CENTER" minWidth="250" contentDisplay="CENTER" text="MonthYear">
+                            <Label fx:id="weekMonthLabel" alignment="CENTER" minWidth="250" contentDisplay="CENTER"
+                                   text="MonthYear">
                                 <padding>
                                     <Insets left="20.0" right="20.0"/>
                                 </padding>

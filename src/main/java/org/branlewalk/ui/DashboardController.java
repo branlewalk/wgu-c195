@@ -167,4 +167,13 @@ public class DashboardController implements Initializable {
         monthViewPane.setVisible(false);
         monthController.setVisible(false);
     }
+
+    public void handleCustomersButton(ActionEvent actionEvent) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("CustomerList.fxml"));
+        Stage reportingStage = new Stage();
+        reportingStage.initModality(Modality.APPLICATION_MODAL);
+        reportingStage.setTitle("Appoint - Customers");
+        reportingStage.setScene(new Scene(root));
+        reportingStage.showAndWait();
+    }
 }

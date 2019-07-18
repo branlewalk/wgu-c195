@@ -5,7 +5,7 @@ import org.branlewalk.dto.CityDTO;
 import java.sql.*;
 
 
-public class CityDaoImpl implements CityDAO {
+public class CityDaoImpl extends DaoIdGenerator<CityDTO> implements CityDAO {
     private Connection connection;
 
     public CityDaoImpl(Connection connection) {
@@ -16,7 +16,7 @@ public class CityDaoImpl implements CityDAO {
     public void create(CityDTO cityDTO, String createdBy, Date createDate) throws SQLException {
         String query = "INSERT INTO city (cityId,city,countryId,createDate,createdBy,lastUpdateBy) VALUES (?,?,?,?,?,?)";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, cityDTO.getCityId());
+        statement.setInt(1, findId());
         statement.setString(2, cityDTO.getCity());
         statement.setInt(3, cityDTO.getCountryId());
         statement.setDate(4, createDate);

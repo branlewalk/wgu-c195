@@ -1,14 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.branlewalk.ui.LoginController"
-            prefHeight="400.0" prefWidth="600.0">
-
-</AnchorPane>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.branlewalk.ui.LoginController"
+      prefHeight="200.0" prefWidth="200.0"
+      alignment="CENTER">
+    <children>
+        <GridPane alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" prefWidth="100.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" prefWidth="100.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints prefHeight="50.0" vgrow="NEVER"/>
+                <RowConstraints prefHeight="10.0" vgrow="NEVER"/>
+                <RowConstraints prefHeight="30.0" vgrow="NEVER"/>
+                <RowConstraints prefHeight="10.0" vgrow="NEVER"/>
+                <RowConstraints prefHeight="30.0" vgrow="NEVER"/>
+                <RowConstraints prefHeight="10.0" vgrow="NEVER"/>
+                <RowConstraints prefHeight="30.0" vgrow="NEVER"/>
+                <RowConstraints prefHeight="10.0" vgrow="NEVER"/>
+                <RowConstraints prefHeight="30.0" vgrow="NEVER"/>
+            </rowConstraints>
+            <children>
+                <Label alignment="CENTER" contentDisplay="CENTER" text="Appoint" GridPane.columnSpan="2"/>
+                <TextField fx:id="user" promptText="username" GridPane.columnSpan="2" GridPane.rowIndex="2"/>
+                <PasswordField fx:id="password" promptText="password" GridPane.columnSpan="2" GridPane.rowIndex="4"/>
+                <Button onAction="#handleSignInButtonAction" text="Sign in" GridPane.columnIndex="1"
+                        GridPane.rowIndex="6"/>
+<!--                <Hyperlink text="Trouble signing in?" GridPane.rowIndex="6"/>-->
+                <Button onAction="#handleCreateAccountButtonAction" text="Create New Account" GridPane.columnSpan="2"
+                        GridPane.rowIndex="8"/>
+                <Text fx:id="loginMessage" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="9"/>
+            </children>
+        </GridPane>
+    </children>
+</VBox>

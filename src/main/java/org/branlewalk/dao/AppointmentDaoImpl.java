@@ -5,7 +5,7 @@ import org.branlewalk.dto.AppointmentDTO;
 import java.sql.*;
 
 
-public class AppointmentDaoImpl implements AppointmentDAO {
+public class AppointmentDaoImpl extends DaoIdGenerator<AppointmentDTO> implements AppointmentDAO {
     private Connection connection;
 
     public AppointmentDaoImpl(Connection connection) {
@@ -17,7 +17,7 @@ public class AppointmentDaoImpl implements AppointmentDAO {
         String query = "INSERT INTO appointment (appointmentId,customerId,userId,title,description,location,contact,type,url," +
                 "start,end,createDate,createdBy,lastUpdateBy) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, dto.getAppointmentId());
+        statement.setInt(1, findId());
         statement.setInt(2, dto.getCustomerId());
         statement.setInt(3, dto.getUserId());
         statement.setString(4, dto.getTitle());

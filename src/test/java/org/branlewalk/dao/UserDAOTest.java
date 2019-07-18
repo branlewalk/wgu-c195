@@ -1,6 +1,5 @@
 package org.branlewalk.dao;
 
-import com.sun.istack.internal.NotNull;
 import org.branlewalk.dto.UserDTO;
 import org.junit.After;
 import org.junit.Before;
@@ -39,7 +38,7 @@ public class UserDAOTest {
         UserDTO dto = createUser();
         Date createDate = getDate(1985,3,25);
         String createdBy = "byme";
-        new UserDaoImpl(connection).create(dto, createdBy, createDate);
+        new UserDaoImpl(connection).create(dto.getName(), dto.getPassword() , createdBy, createDate);
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT userId,userName,password,active,createDate,createdBy,lastUpdateBy FROM user");
         assertThat(resultSet.next(), is(true));
@@ -58,7 +57,7 @@ public class UserDAOTest {
     public void read() throws SQLException {
         UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO dto = createUser();
-        userDAO.create(dto, "byme", getDate(1985,8,2));
+        userDAO.create(dto.getName(), dto.getPassword(), "byme", getDate(1985,8,2));
         UserDTO actualDTO = userDAO.read(dto.getId());
         assertThat(actualDTO, notNullValue());
         assertThat(actualDTO.getId(), is(dto.getId()));
@@ -79,7 +78,7 @@ public class UserDAOTest {
     public void update() throws SQLException {
         UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO dto = createUser();
-        userDAO.create(dto, "byme", getDate(2016,5,31));
+        userDAO.create(dto.getName(), dto.getPassword(), "byme", getDate(2016,5,31));
         UserDTO updateDTO = new UserDTO(dto.getId(),"bythem", "newPW", false);
         userDAO.update( "bythem", updateDTO);
         Statement statement = connection.createStatement();
@@ -98,7 +97,7 @@ public class UserDAOTest {
     public void delete() throws SQLException {
         UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO dto = createUser();
-        userDAO.create(dto, "byme", getDate(2016,5,31));
+        userDAO.create(dto.getName(), dto.getPassword(), "byme", getDate(2016,5,31));
         assertThat(userDAO.read(dto.getId()), notNullValue());
         userDAO.delete(dto.getId());
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM user WHERE userId = ?");
@@ -116,7 +115,7 @@ public class UserDAOTest {
     }
 
     private UserDTO createUser() throws SQLException {
-        UserDTO dto = new UserDTO(1, "name", "password", false);
+        UserDTO dto = new UserDTO(1, "name", "password", true);
         deleteUser(dto);
         return dto;
     }

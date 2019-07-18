@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<BorderPane fx:controller="org.branlewalk.ui.DashboardController" maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <bottom>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="90.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="90.0"/>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="120.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="100.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="50.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="70.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="70.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints prefHeight="40.0" vgrow="NEVER"/>
+            </rowConstraints>
+            <children>
+                <Button text="Customers" GridPane.columnIndex="0"/>
+                <Button text="Reporting" GridPane.columnIndex="1" onAction="#handleReportingButtonAction"/>
+                <Label text="Appointments: " GridPane.columnIndex="3"/>
+                <Button text="New" GridPane.columnIndex="4"/>
+                <Button text="Update" GridPane.columnIndex="5"/>
+                <Button text="Delete" GridPane.columnIndex="6"/>
+            </children>
+        </GridPane>
+    </bottom>
+    <top>
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="100.0"/>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="100.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="40.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="65.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="65.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <Label text="View:" GridPane.columnIndex="2"/>
+                <Button onAction="#handleWeekViewButton" text="Week" GridPane.columnIndex="3"/>
+                <Button onAction="#handleMonthViewButton" text="Month" GridPane.columnIndex="4"/>
+            </children>
+        </GridPane>
+    </top>
+    <center>
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <children>
+                <StackPane>
+                    <HBox fx:id="monthController" alignment="CENTER" prefHeight="23.0" prefWidth="600.0"
+                          scaleShape="false">
+                        <children>
+                            <Button onAction="#handlePreviousMonthButton" contentDisplay="TEXT_ONLY" scaleX="0.5"
+                                    scaleY="0.5" text="&lt;&lt;"/>
+                            <Label fx:id="monthYearLabel" alignment="CENTER" minWidth="250" contentDisplay="CENTER" text="MonthYear">
+                                <padding>
+                                    <Insets left="20.0" right="20.0"/>
+                                </padding>
+                            </Label>
+                            <Button onAction="#handleNextMonthButton" contentDisplay="TEXT_ONLY" scaleX="0.5"
+                                    scaleY="0.5"
+                                    text="&gt;&gt;"/>
+                        </children>
+                    </HBox>
+                    <HBox fx:id="weekController" alignment="CENTER" prefHeight="23.0" prefWidth="600.0"
+                          scaleShape="false">
+                        <children>
+                            <Button onAction="#handlePreviousWeekButton" contentDisplay="TEXT_ONLY" scaleX="0.5"
+                                    scaleY="0.5" text="&lt;&lt;"/>
+                            <Label fx:id="weekMonthLabel" alignment="CENTER" minWidth="250" contentDisplay="CENTER" text="MonthYear">
+                                <padding>
+                                    <Insets left="20.0" right="20.0"/>
+                                </padding>
+                            </Label>
+                            <Button onAction="#handleNextWeekButton" contentDisplay="TEXT_ONLY" scaleX="0.5"
+                                    scaleY="0.5"
+                                    text="&gt;&gt;"/>
+                        </children>
+                    </HBox>
+                </StackPane>
+                <GridPane>
+                    <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" percentWidth="14.3" hgrow="ALWAYS"/>
+                        <ColumnConstraints halignment="CENTER" percentWidth="14.3" hgrow="ALWAYS"/>
+                        <ColumnConstraints halignment="CENTER" percentWidth="14.3" hgrow="ALWAYS"/>
+                        <ColumnConstraints halignment="CENTER" percentWidth="14.3" hgrow="ALWAYS"/>
+                        <ColumnConstraints halignment="CENTER" percentWidth="14.3" hgrow="ALWAYS"/>
+                        <ColumnConstraints halignment="CENTER" percentWidth="14.3" hgrow="ALWAYS"/>
+                        <ColumnConstraints halignment="CENTER" percentWidth="14.3" hgrow="ALWAYS"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints prefHeight="40.0" vgrow="NEVER"/>
+                    </rowConstraints>
+                    <children>
+                        <Label text="Sunday" GridPane.columnIndex="0"/>
+                        <Label text="Monday" GridPane.columnIndex="1"/>
+                        <Label text="Tuesday" GridPane.columnIndex="2"/>
+                        <Label text="Wednesday" GridPane.columnIndex="3"/>
+                        <Label text="Thursday" GridPane.columnIndex="4"/>
+                        <Label text="Friday" GridPane.columnIndex="5"/>
+                        <Label text="Saturday" GridPane.columnIndex="6"/>
+                    </children>
+                </GridPane>
+                <StackPane>
+                    <GridPane fx:id="monthViewPane"/>
+                    <GridPane fx:id="weekViewPane"/>
+                </StackPane>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

@@ -4,7 +4,7 @@ import org.branlewalk.dto.UserDTO;
 import java.sql.*;
 
 
-public class UserDaoImpl implements UserDAO {
+public class UserDaoImpl extends DaoIdGenerator<UserDTO> implements UserDAO {
     private Connection connection;
 
     public UserDaoImpl(Connection connection) {
@@ -12,13 +12,13 @@ public class UserDaoImpl implements UserDAO {
         this.connection = connection;
     }
 
-    public void create(UserDTO userDTO, String createdBy, Date createDate) throws SQLException {
+    public void create(String userName, String password, String createdBy, Date createDate) throws SQLException {
         String query = "INSERT INTO user (userId,userName,password,active,createDate,createdBy,lastUpdateBy) VALUES (?,?,?,?,?,?,?)";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, userDTO.getId());
-        statement.setString(2, userDTO.getName());
-        statement.setString(3, userDTO.getPassword());
-        statement.setBoolean(4, userDTO.isActive());
+        statement.setInt(1, findId());
+        statement.setString(2, userName);
+        statement.setString(3,password);
+        statement.setBoolean(4, true);
         statement.setDate(5, createDate);
         statement.setString(6, createdBy);
         statement.setString(7, createdBy);
@@ -26,18 +26,12 @@ public class UserDaoImpl implements UserDAO {
         statement.close();
     }
 
+    @Override
     public UserDTO read(int id) throws SQLException {
         String query = "SELECT userId,userName,password,active FROM user WHERE userId = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1,id);
-        ResultSet resultSet = statement.executeQuery();
-        if (resultSet.next()) {
-            return new UserDTO(resultSet.getInt("userId"),
-                    resultSet.getString("userName"),
-                    resultSet.getString("password"),
-                    resultSet.getBoolean("active"));
-        }
-        return null;
+        return getUserDTO(statement);
     }
 
     public void update(String lastUpdateBy, UserDTO updateDTO) throws SQLException {
@@ -59,5 +53,23 @@ public class UserDaoImpl implements UserDAO {
         statement.setInt(1,id);
         statement.execute();
         statement.close();
+    }
+
+    public UserDTO find(String name) throws SQLException {
+        String query = "SELECT userId,userName,password,active FROM user WHERE userName = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1,name);
+        return getUserDTO(statement);
+    }
+
+    private UserDTO getUserDTO(PreparedStatement statement) throws SQLException {
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return new UserDTO(resultSet.getInt("userId"),
+                    resultSet.getString("userName"),
+                    resultSet.getString("password"),
+                    resultSet.getBoolean("active"));
+        }
+        return null;
     }
 }

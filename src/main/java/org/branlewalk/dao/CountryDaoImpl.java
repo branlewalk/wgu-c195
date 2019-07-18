@@ -5,7 +5,7 @@ import org.branlewalk.dto.CountryDTO;
 import java.sql.*;
 
 
-public class CountryDaoImpl implements CountryDAO {
+public class CountryDaoImpl extends DaoIdGenerator<CountryDTO> implements CountryDAO {
     private Connection connection;
 
     public CountryDaoImpl(Connection connection) {
@@ -16,7 +16,7 @@ public class CountryDaoImpl implements CountryDAO {
     public void create(CountryDTO countryDTO, String createdBy, Date createDate) throws SQLException {
         String query = "INSERT INTO country (countryId,country,createDate,createdBy,lastUpdateBy) VALUES (?,?,?,?,?)";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, countryDTO.getCountryId());
+        statement.setInt(1, findId());
         statement.setString(2, countryDTO.getCountry());
         statement.setDate(3, createDate);
         statement.setString(4, createdBy);

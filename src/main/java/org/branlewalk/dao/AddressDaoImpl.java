@@ -5,7 +5,7 @@ import org.branlewalk.dto.AddressDTO;
 import java.sql.*;
 
 
-public class AddressDaoImpl implements AddressDAO {
+public class AddressDaoImpl extends DaoIdGenerator<AddressDTO> implements AddressDAO {
     private Connection connection;
 
     public AddressDaoImpl(Connection connection) {
@@ -16,7 +16,7 @@ public class AddressDaoImpl implements AddressDAO {
     public void create(AddressDTO addressDTO, String createdBy, Date createDate) throws SQLException {
         String query = "INSERT INTO address (addressId,address,address2,cityId,postalCode,phone,createDate,createdBy,lastUpdateBy) VALUES (?,?,?,?,?,?,?,?,?)";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, addressDTO.getAddressId());
+        statement.setInt(1, findId());
         statement.setString(2, addressDTO.getAddress());
         statement.setString(3, addressDTO.getAddress2());
         statement.setInt(4, addressDTO.getCityId());
@@ -29,6 +29,7 @@ public class AddressDaoImpl implements AddressDAO {
         statement.close();
     }
 
+    @Override
     public AddressDTO read(int id) throws SQLException {
         String query = "SELECT addressId,address,address2,cityId,postalCode,phone FROM address WHERE addressId = ?";
         PreparedStatement statement = connection.prepareStatement(query);

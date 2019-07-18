@@ -5,7 +5,7 @@ import org.branlewalk.dto.CustomerDTO;
 import java.sql.*;
 
 
-public class CustomerDaoImpl implements CustomerDAO {
+public class CustomerDaoImpl extends DaoIdGenerator<CustomerDTO> implements CustomerDAO {
     private Connection connection;
 
     public CustomerDaoImpl(Connection connection) {
@@ -16,7 +16,7 @@ public class CustomerDaoImpl implements CustomerDAO {
     public void create(CustomerDTO customerDTO, String createdBy, Date createDate) throws SQLException {
         String query = "INSERT INTO customer (customerId,customerName,addressId,active,createDate,createdBy,lastUpdateBy) VALUES (?,?,?,?,?,?,?)";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, customerDTO.getCustomerId());
+        statement.setInt(1, findId());
         statement.setString(2, customerDTO.getCustomerName());
         statement.setInt(3, customerDTO.getAddressId());
         statement.setBoolean(4, customerDTO.isActive());

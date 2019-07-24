@@ -8,7 +8,6 @@ public class UserDaoImpl extends DaoIdGenerator<UserDTO> implements UserDAO {
     private Connection connection;
 
     public UserDaoImpl(Connection connection) {
-
         this.connection = connection;
     }
 

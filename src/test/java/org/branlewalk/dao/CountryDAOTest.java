@@ -39,15 +39,13 @@ public class CountryDAOTest {
     @Test
     public void create() throws SQLException {
         CountryDTO dto = createCountry();
-        Date createDate = getDate(1985,3,25);
         String createdBy = "byme";
-        new CountryDaoImpl(connection).create(dto, createdBy, createDate);
+        new CountryDaoImpl(connection).create(dto.getCountry(), createdBy);
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(selectQuery);
         assertThat(resultSet.next(), is(true));
         assertThat(resultSet.getInt("countryId"), is(dto.getCountryId()));
         assertThat(resultSet.getString("country"), is(dto.getCountry()));
-        assertThat(resultSet.getDate("createDate").getTime(), is(createDate.getTime()));
         assertThat(resultSet.getString("createdBy"), is(createdBy));
         assertThat(resultSet.getString("lastUpdateBy"), is(createdBy));
         statement.close();
@@ -58,7 +56,7 @@ public class CountryDAOTest {
     public void read() throws SQLException {
         CountryDAO countryDAO = new CountryDaoImpl(connection);
         CountryDTO dto = createCountry();
-        countryDAO.create(dto, "byme", getDate(1985,8,2));
+        countryDAO.create(dto.getCountry(), "byme");
         CountryDTO actualDTO = countryDAO.read(dto.getCountryId());
         assertThat(actualDTO, notNullValue());
         assertThat(actualDTO.getCountryId(), is(dto.getCountryId()));
@@ -77,9 +75,9 @@ public class CountryDAOTest {
     public void update() throws SQLException {
         CountryDAO countryDAO = new CountryDaoImpl(connection);
         CountryDTO dto = createCountry();
-        countryDAO.create(dto, "byme", getDate(2016,5,31));
+        countryDAO.create(dto.getCountry(), "byme");
         CountryDTO updateDTO = new CountryDTO(dto.getCountryId(),"switzerland");
-        countryDAO.update( "bythem", updateDTO);
+        countryDAO.update(updateDTO, "bythem");
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(selectQuery);
         assertThat(resultSet.next(), is(true));
@@ -94,7 +92,7 @@ public class CountryDAOTest {
     public void delete() throws SQLException {
         CountryDAO countryDAO = new CountryDaoImpl(connection);
         CountryDTO dto = createCountry();
-        countryDAO.create(dto, "byme", getDate(2016,5,31));
+        countryDAO.create(dto.getCountry(), "byme");
         assertThat(countryDAO.read(dto.getCountryId()), notNullValue());
         countryDAO.delete(dto.getCountryId());
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM country WHERE countryId = ?");

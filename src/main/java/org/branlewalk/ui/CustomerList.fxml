@@ -5,7 +5,8 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:controller="org.branlewalk.ui.CustomerListController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+<GridPane fx:controller="org.branlewalk.ui.CustomerListController" maxHeight="-Infinity" maxWidth="-Infinity"
+          minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
           prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
     <columnConstraints>
         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
@@ -21,11 +22,19 @@
         <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES"/>
     </rowConstraints>
     <children>
-        <Button text="Delete" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
-        <Button text="Update" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
-        <Button text="Add" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-        <TableView prefHeight="345.0" prefWidth="559.0" GridPane.columnSpan="4" GridPane.rowIndex="1"
-                   GridPane.rowSpan="3"/>
+        <Button text="Delete" GridPane.columnIndex="3" GridPane.rowIndex="4" onAction="#handleDeleteButton"/>
+        <Button text="Update" GridPane.columnIndex="2" GridPane.rowIndex="4" onAction="#handleUpdateButton"/>
+        <Button text="Add" GridPane.columnIndex="1" GridPane.rowIndex="4" onAction="#handleAddButton"/>
+        <TableView fx:id="customerListTable" prefHeight="345.0" prefWidth="559.0" GridPane.columnSpan="4" GridPane.rowIndex="1"
+                   GridPane.rowSpan="3">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Name"/>
+                <TableColumn fx:id="phoneColumn" text="Phone"/>
+                <TableColumn fx:id="postalColumn" text="Postal Code"/>
+                <TableColumn fx:id="cityColumn" text="City"/>
+                <TableColumn fx:id="countryColumn" text="Country"/>
+            </columns>
+        </TableView>
         <Label text="Customers" GridPane.halignment="LEFT">
             <GridPane.margin>
                 <Insets left="20.0"/>

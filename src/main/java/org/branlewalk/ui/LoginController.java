@@ -34,14 +34,10 @@ public class LoginController {
     private PasswordField password;
     private final UserDAO userDao;
     private ResourceBundle bundles = ResourceBundle.getBundle("language", Locale.getDefault());
+    static String username;
 
     public LoginController() throws SQLException {
-        String db = "U05vOU";
-        String url = "jdbc:mysql://52.206.157.109/" + db;
-        String user = "U05vOU";
-        String pass = "53688621490";
-        Connection connection = DriverManager.getConnection(url, user, pass);
-        userDao = new UserDaoImpl(connection);
+        userDao = new UserDaoImpl(Main.connection());
     }
 
     @FXML
@@ -54,6 +50,7 @@ public class LoginController {
                 if(!userDTO.getPassword().equals(password.getText())) {
                     loginMessage.setText(bundles.getString("key2")+ user.getText());
                 } else {
+                    username = userDTO.getName();
                     Parent root = FXMLLoader.load(getClass().getResource("Dashboard.fxml"));
                     Stage dashboard = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                     dashboard.setTitle("Appoint - Dashboard");
@@ -75,6 +72,7 @@ public class LoginController {
             } else {
                 userDao.create(user.getText(), password.getText(), user.getText(), new Date(System.currentTimeMillis()));
                 loginMessage.setText(bundles.getString("key5"));
+
             }
         } catch (SQLException e) {
             loginMessage.setText(bundles.getString("key3") + user.getText() + " " + e.getMessage());

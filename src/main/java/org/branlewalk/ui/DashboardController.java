@@ -122,12 +122,8 @@ public class DashboardController implements Initializable {
     }
 
     public void handleReportingButtonAction(ActionEvent actionEvent) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("Reporting.fxml"));
-        Stage reportingStage = new Stage();
-        reportingStage.initModality(Modality.APPLICATION_MODAL);
-        reportingStage.setTitle("Appoint - Reporting");
-        reportingStage.setScene(new Scene(root));
-        reportingStage.showAndWait();
+        Main.newWindow("Reporting", "Reporting.fxml");
+
     }
 
     public void handlePreviousMonthButton(ActionEvent actionEvent) {
@@ -169,11 +165,6 @@ public class DashboardController implements Initializable {
     }
 
     public void handleCustomersButton(ActionEvent actionEvent) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("CustomerList.fxml"));
-        Stage reportingStage = new Stage();
-        reportingStage.initModality(Modality.APPLICATION_MODAL);
-        reportingStage.setTitle("Appoint - Customers");
-        reportingStage.setScene(new Scene(root));
-        reportingStage.showAndWait();
+        Main.newWindow("Customers","CustomerList.fxml");
     }
 }

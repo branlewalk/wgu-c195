@@ -34,7 +34,7 @@ public class CityDAOTest {
         System.out.println("Connected to database : " + db);
         countryDTO = new CountryDTO(1, "sweden");
         countryDAO = new CountryDaoImpl(connection);
-        countryDAO.create(countryDTO, "byme", getDate(1999,12,31));
+        countryDAO.create(countryDTO.getCountry(),"byme");
     }
 
     @After
@@ -49,16 +49,15 @@ public class CityDAOTest {
     @Test
     public void create() throws SQLException {
         CityDTO dto = createCity();
-        Date createDate = getDate(1985,3,25);
         String createdBy = "byme";
-        new CityDaoImpl(connection).create(dto, createdBy, createDate);
+        new CityDaoImpl(connection).create(dto.getCity(), dto.getCityId(), createdBy);
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(selectQuery);
         assertThat(resultSet.next(), is(true));
         assertThat(resultSet.getInt("cityId"), is(dto.getCityId()));
         assertThat(resultSet.getString("city"), is(dto.getCity()));
         assertThat(resultSet.getInt("countryId"), is(dto.getCountryId()));
-        assertThat(resultSet.getDate("createDate").getTime(), is(createDate.getTime()));
+
         assertThat(resultSet.getString("createdBy"), is(createdBy));
         assertThat(resultSet.getString("lastUpdateBy"), is(createdBy));
         statement.close();
@@ -69,7 +68,8 @@ public class CityDAOTest {
     public void read() throws SQLException {
         CityDAO cityDAO = new CityDaoImpl(connection);
         CityDTO dto = createCity();
-        cityDAO.create(dto, "byme", getDate(1985,8,2));
+        String createdBy = "byme";
+        cityDAO.create(dto.getCity(), dto.getCityId(), createdBy);
         CityDTO actualDTO = cityDAO.read(dto.getCityId());
         assertThat(actualDTO, notNullValue());
         assertThat(actualDTO.getCityId(), is(dto.getCityId()));
@@ -89,7 +89,8 @@ public class CityDAOTest {
     public void update() throws SQLException {
         CityDAO cityDAO = new CityDaoImpl(connection);
         CityDTO dto = createCity();
-        cityDAO.create(dto, "byme", getDate(2016,5,31));
+        String createdBy = "byme";
+        cityDAO.create(dto.getCity(), dto.getCityId(), createdBy);
         CityDTO updateDTO = new CityDTO(dto.getCityId(),"new york", countryDTO.getCountryId());
         cityDAO.update( "bythem", updateDTO);
         Statement statement = connection.createStatement();
@@ -107,7 +108,8 @@ public class CityDAOTest {
     public void delete() throws SQLException {
         CityDAO cityDAO = new CityDaoImpl(connection);
         CityDTO dto = createCity();
-        cityDAO.create(dto, "byme", getDate(2016,5,31));
+        String createdBy = "byme";
+        cityDAO.create(dto.getCity(), dto.getCityId(), createdBy);
         assertThat(cityDAO.read(dto.getCityId()), notNullValue());
         cityDAO.delete(dto.getCityId());
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM city WHERE cityId = ?");
@@ -128,14 +130,6 @@ public class CityDAOTest {
         CityDTO dto = new CityDTO(1, "seattle", countryDTO.getCountryId());
         deleteCity(dto);
         return dto;
-    }
-
-    private Date getDate(int year, int month, int day) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month-1, day, 0, 0, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return new Date(calendar.getTime().getTime());
     }
 
 }

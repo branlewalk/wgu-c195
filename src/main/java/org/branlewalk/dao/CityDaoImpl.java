@@ -13,30 +13,25 @@ public class CityDaoImpl extends DaoIdGenerator<CityDTO> implements CityDAO {
         this.connection = connection;
     }
 
-    public void create(CityDTO cityDTO, String createdBy, Date createDate) throws SQLException {
-        String query = "INSERT INTO city (cityId,city,countryId,createDate,createdBy,lastUpdateBy) VALUES (?,?,?,?,?,?)";
+    public CityDTO create(String city, int countryId, String createdBy) throws SQLException {
+        String query = "INSERT INTO city (cityId,city,countryId,createDate,createdBy,lastUpdateBy) VALUES (?,?,?,NOW(),?,?)";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, findId());
-        statement.setString(2, cityDTO.getCity());
-        statement.setInt(3, cityDTO.getCountryId());
-        statement.setDate(4, createDate);
+        int id = findId();
+        statement.setInt(1, id);
+        statement.setString(2, city);
+        statement.setInt(3, countryId);
+        statement.setString(4, createdBy);
         statement.setString(5, createdBy);
-        statement.setString(6, createdBy);
         statement.execute();
         statement.close();
+        return new CityDTO(id, city, countryId);
     }
 
     public CityDTO read(int id) throws SQLException {
         String query = "SELECT cityId,city,countryId FROM city WHERE cityId = ?";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1,id);
-        ResultSet resultSet = statement.executeQuery();
-        if (resultSet.next()) {
-            return new CityDTO(resultSet.getInt("cityId"),
-                    resultSet.getString("city"),
-                    resultSet.getInt("countryId"));
-        }
-        return null;
+        statement.setInt(1, id);
+        return getCityDTO(statement);
     }
 
     public void update(String lastUpdateBy, CityDTO updateDTO) throws SQLException {
@@ -54,8 +49,25 @@ public class CityDaoImpl extends DaoIdGenerator<CityDTO> implements CityDAO {
     public void delete(int id) throws SQLException {
         String query = "DELETE FROM city WHERE cityId = ?";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1,id);
+        statement.setInt(1, id);
         statement.execute();
         statement.close();
+    }
+
+    public CityDTO find(String name) throws SQLException {
+        String query = "SELECT cityId,city,countryId FROM city WHERE city = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, name);
+        return getCityDTO(statement);
+    }
+
+    private CityDTO getCityDTO(PreparedStatement statement) throws SQLException {
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return new CityDTO(resultSet.getInt("cityId"),
+                    resultSet.getString("city"),
+                    resultSet.getInt("countryId"));
+        }
+        return null;
     }
 }

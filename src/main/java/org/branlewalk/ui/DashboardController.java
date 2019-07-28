@@ -6,7 +6,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -86,14 +85,10 @@ public class DashboardController implements Initializable {
                     currentDay++;
                 }
                 if (start && !finish) {
-                    TableColumn<String, String> appointments = new TableColumn<>(String.valueOf(currentDay));
-                    day.setPlaceholder(new Label());
-                    appointments.prefWidthProperty().bind(day.widthProperty());
-                    day.getColumns().add(appointments);
-                    day.visibleProperty().setValue(true);
-                    day.onMouseClickedProperty().set(event -> {
-                        new Alert(Alert.AlertType.CONFIRMATION, String.valueOf(appointments.getText())).showAndWait();
-                    });
+                    Calendar dayCalendar = Calendar.getInstance();
+                    dayCalendar.setTime(calendar.getTime());
+                    dayCalendar.add(Calendar.DATE, currentDay-1);
+                    populateDayView(day, String.valueOf(currentDay), dayCalendar.getTime());
                 } else {
                     day.visibleProperty().setValue(false);
                 }
@@ -110,15 +105,39 @@ public class DashboardController implements Initializable {
         for (int col = 0; col < dayStrings.size(); col++) {
             TableView<String> day = weekDays.get(col);
             day.getColumns().clear();
-            TableColumn<String, String> appointments = new TableColumn<>(String.valueOf(dayStrings.get(col)));
-            day.setPlaceholder(new Label());
-            appointments.prefWidthProperty().bind(day.widthProperty());
-            day.getColumns().add(appointments);
-            day.visibleProperty().setValue(true);
-            day.onMouseClickedProperty().set(event -> {
-                new Alert(Alert.AlertType.CONFIRMATION, String.valueOf(appointments.getText())).showAndWait();
-            });
+            String header = String.valueOf(dayStrings.get(col));
+            Calendar dayCalendar = Calendar.getInstance();
+            dayCalendar.setTime(calendar.getTime());
+            dayCalendar.add(Calendar.DATE, col-6);
+            populateDayView(day, header, dayCalendar.getTime());
         }
+    }
+
+    private void populateDayView(TableView<String> day, String header, Date date) {
+        TableColumn<String, String> appointments = new TableColumn<>(header);
+        day.setPlaceholder(new Label());
+        appointments.prefWidthProperty().bind(day.widthProperty());
+        day.getColumns().add(appointments);
+        day.visibleProperty().setValue(true);
+        day.onMouseClickedProperty().set(event -> {
+            try {
+                newWindow2("Appointment", "Appointment.fxml", date);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public static void newWindow2(String title, String view, Date date) throws IOException {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
+        Parent root = loader.load();
+        AppointmentController controller = loader.getController();
+        controller.setDate(date);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(title);
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
     }
 
     public void handleReportingButtonAction(ActionEvent actionEvent) throws IOException {

@@ -5,10 +5,11 @@ import java.sql.*;
 
 
 public class UserDaoImpl extends DaoIdGenerator<UserDTO> implements UserDAO {
-    private Connection connection;
+
 
     public UserDaoImpl(Connection connection) {
-        this.connection = connection;
+        super(connection, "user", "userId");
+
     }
 
     public void create(String userName, String password, String createdBy, Date createDate) throws SQLException {

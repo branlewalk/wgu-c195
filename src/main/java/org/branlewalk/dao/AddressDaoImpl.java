@@ -6,11 +6,9 @@ import java.sql.*;
 
 
 public class AddressDaoImpl extends DaoIdGenerator<AddressDTO> implements AddressDAO {
-    private Connection connection;
 
     public AddressDaoImpl(Connection connection) {
-
-        this.connection = connection;
+        super(connection, "address", "addressId");
     }
 
     public AddressDTO create(String address, String address2, int cityId, String postalCode, String phone, String createdBy) throws SQLException {

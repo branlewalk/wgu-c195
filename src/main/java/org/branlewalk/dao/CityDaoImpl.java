@@ -6,11 +6,9 @@ import java.sql.*;
 
 
 public class CityDaoImpl extends DaoIdGenerator<CityDTO> implements CityDAO {
-    private Connection connection;
 
     public CityDaoImpl(Connection connection) {
-
-        this.connection = connection;
+        super(connection, "city", "cityId");
     }
 
     public CityDTO create(String city, int countryId, String createdBy) throws SQLException {

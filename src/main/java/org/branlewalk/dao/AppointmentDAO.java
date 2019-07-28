@@ -5,6 +5,7 @@ import org.branlewalk.dto.AppointmentDTO;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.List;
 
 
 public interface AppointmentDAO {
@@ -16,4 +17,6 @@ public interface AppointmentDAO {
     void update(String lastUpdateBy, AppointmentDTO updateDTO) throws SQLException;
 
     void delete(int id) throws SQLException;
+
+    List<String> findTypes() throws SQLException;
 }

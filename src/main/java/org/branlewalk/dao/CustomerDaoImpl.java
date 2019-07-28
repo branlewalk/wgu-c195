@@ -13,14 +13,13 @@ import java.sql.*;
 
 
 public class CustomerDaoImpl extends DaoIdGenerator<CustomerDTO> implements CustomerDAO {
-    private final Connection connection;
     private final String username;
     private final CountryDAO countryDAO;
     private final CityDAO cityDAO;
     private final AddressDAO addressDAO;
 
     public CustomerDaoImpl(Connection connection, String username) {
-        this.connection = connection;
+        super(connection, "customer", "customerId");
         this.username = username;
         countryDAO = new CountryDaoImpl(connection);
         cityDAO = new CityDaoImpl(this.connection);

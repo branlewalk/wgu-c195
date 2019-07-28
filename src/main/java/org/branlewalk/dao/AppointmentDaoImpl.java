@@ -3,14 +3,14 @@ package org.branlewalk.dao;
 import org.branlewalk.dto.AppointmentDTO;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AppointmentDaoImpl extends DaoIdGenerator<AppointmentDTO> implements AppointmentDAO {
-    private Connection connection;
 
     public AppointmentDaoImpl(Connection connection) {
-
-        this.connection = connection;
+        super(connection, "appointment", "appointmentId");
     }
 
     public void create(AppointmentDTO dto, String createdBy, Date createDate) throws SQLException {
@@ -37,7 +37,7 @@ public class AppointmentDaoImpl extends DaoIdGenerator<AppointmentDTO> implement
 
     public AppointmentDTO read(int id) throws SQLException {
         String query = "SELECT appointmentId,customerId,userId,title,description,location,contact,type,url,start,end" +
-                " FROM user WHERE appointmentId = ?";
+                " FROM appointment WHERE appointmentId = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, id);
         ResultSet resultSet = statement.executeQuery();
@@ -58,7 +58,7 @@ public class AppointmentDaoImpl extends DaoIdGenerator<AppointmentDTO> implement
     }
 
     public void update(String lastUpdateBy, AppointmentDTO updateDTO) throws SQLException {
-        String query = "UPDATE appointment SET customerId = ?, userId = ?, title = ?, , description = ?, location = ?," +
+        String query = "UPDATE appointment SET customerId = ?, userId = ?, title = ?, description = ?, location = ?," +
                 "contact = ?, type = ?, url = ?, start = ?, end = ?, lastUpdateBy = ? WHERE appointmentId = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, updateDTO.getCustomerId());
@@ -79,10 +79,22 @@ public class AppointmentDaoImpl extends DaoIdGenerator<AppointmentDTO> implement
     }
 
     public void delete(int appointmentId) throws SQLException {
-        String query = "DELETE FROM user WHERE userId = ?";
+        String query = "DELETE FROM appointment WHERE appointmentId = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setInt(1, appointmentId);
         statement.execute();
         statement.close();
+    }
+
+    @Override
+    public List<String> findTypes() throws SQLException {
+        String query = "SELECT DISTINCT type FROM appointment";
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        ArrayList<String> types = new ArrayList<>();
+        while (resultSet.next()) {
+            types.add(resultSet.getString("type"));
+        }
+        return types;
     }
 }

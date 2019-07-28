@@ -6,11 +6,10 @@ import java.sql.*;
 
 
 public class CountryDaoImpl extends DaoIdGenerator<CountryDTO> implements CountryDAO {
-    private Connection connection;
+
 
     public CountryDaoImpl(Connection connection) {
-
-        this.connection = connection;
+        super(connection, "country", "countryId");
     }
 
     public CountryDTO create(String country, String createdBy) throws SQLException {

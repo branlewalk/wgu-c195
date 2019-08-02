@@ -26,16 +26,12 @@ public class CustomerController {
     @FXML
     public void handleSaveButton(ActionEvent actionEvent) throws SQLException {
         addCustomer();
-        final Node source = (Node) actionEvent.getSource();
-        final Stage stage = (Stage) source.getScene().getWindow();
-        stage.close();
+        Main.closeWindow(actionEvent);
     }
 
     @FXML
     public void handleCancelButton(ActionEvent actionEvent) {
-        final Node source = (Node) actionEvent.getSource();
-        final Stage stage = (Stage) source.getScene().getWindow();
-        stage.close();
+        Main.closeWindow(actionEvent);
     }
 
     void addCustomer() throws SQLException {

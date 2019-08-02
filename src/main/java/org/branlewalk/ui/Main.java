@@ -1,9 +1,14 @@
 package org.branlewalk.ui;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -13,8 +18,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Date;
-
-import static com.sun.javafx.scene.control.skin.Utils.getResource;
 
 public class Main extends Application {
 
@@ -50,6 +53,39 @@ public class Main extends Application {
         stage.setTitle(title);
         stage.setScene(new Scene(root));
         stage.showAndWait();
+    }
+
+    public static boolean newAppointmentWindow(String title, String view, Date date) throws IOException {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
+        Parent root = loader.load();
+        AppointmentController controller = loader.getController();
+        controller.setDate(date);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(title);
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+        return controller.wasCancel();
+    }
+
+    public static void newReportWindow(String title, String view, CategoryAxis xAxis, NumberAxis yAxis, XYChart.Series chartData) throws IOException {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
+        Parent root = loader.load();
+        ReportController controller = loader.getController();
+        controller.setCategoryAxis(xAxis);
+        controller.setNumberAxis(yAxis);
+        controller.setChartData(chartData);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(title);
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+    }
+
+    public static void closeWindow(ActionEvent actionEvent) {
+        final Node source = (Node) actionEvent.getSource();
+        final Stage stage = (Stage) source.getScene().getWindow();
+        stage.close();
     }
 
 }

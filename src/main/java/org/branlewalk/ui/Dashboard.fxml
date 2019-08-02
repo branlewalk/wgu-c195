@@ -25,10 +25,6 @@
             <children>
                 <Button text="Customers" GridPane.columnIndex="0" onAction="#handleCustomersButton"/>
                 <Button text="Reporting" GridPane.columnIndex="1" onAction="#handleReportingButtonAction"/>
-                <Label text="Appointments: " GridPane.columnIndex="3"/>
-                <Button text="New" GridPane.columnIndex="4"/>
-                <Button text="Update" GridPane.columnIndex="5"/>
-                <Button text="Delete" GridPane.columnIndex="6"/>
             </children>
         </GridPane>
     </bottom>
@@ -46,8 +42,8 @@
             </rowConstraints>
             <children>
                 <Label text="View:" GridPane.columnIndex="2"/>
-                <Button text="Week" GridPane.columnIndex="3" onAction="#handleWeekViewButton"/>
-                <Button text="Month" GridPane.columnIndex="4" onAction="#handleMonthViewButton"/>
+                <Button fx:id="weekView" text="Week" GridPane.columnIndex="3" onAction="#handleWeekViewButton"/>
+                <Button fx:id="MonthView" text="Month" GridPane.columnIndex="4" onAction="#handleMonthViewButton"/>
             </children>
         </GridPane>
     </top>

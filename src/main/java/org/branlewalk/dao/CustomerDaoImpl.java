@@ -41,6 +41,14 @@ public class CustomerDaoImpl extends DaoIdGenerator<CustomerDTO> implements Cust
         return new CustomerDTO(id, customerName, addressId, active);
     }
 
+    @Override
+    public Customer create(String customerName, String address1, String address2, String city, String postalCode, String country, String phone) throws SQLException {
+        CountryDTO countryDTO = countryDAO.create(country, username);
+        CityDTO cityDTO = cityDAO.create(city, countryDTO.getCountryId(), username);
+        AddressDTO addressDTO = addressDAO.create(address1, address2, cityDTO.getCityId(), postalCode, phone, username);
+        CustomerDTO customerDTO = create(customerName, addressDTO.getAddressId(), true, username);
+        return new CustomerImpl(customerDTO, addressDTO, cityDTO, countryDTO);
+    }
     public CustomerDTO read(int id) throws SQLException {
         String query = "SELECT customerId,customerName,addressId,active,createDate,createdBy,lastUpdateBy FROM customer WHERE customerId = ?";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -70,7 +78,7 @@ public class CustomerDaoImpl extends DaoIdGenerator<CustomerDTO> implements Cust
     }
 
     public CustomerDTO find(String name) throws SQLException {
-        String query = "SELECT customerId,customerName,addressId,active,createDate,createdBy,lastUpdateBy FROM customer WHERE customerId = ?";
+        String query = "SELECT customerId,customerName,addressId,active,createDate,createdBy,lastUpdateBy FROM customer WHERE customerName = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         statement.setString(1, name);
         return getCustomerDTO(statement);
@@ -85,15 +93,6 @@ public class CustomerDaoImpl extends DaoIdGenerator<CustomerDTO> implements Cust
             customers.add(getCustomer(resultSet));
         }
         return customers;
-    }
-
-    @Override
-    public Customer create(String customerName, String address1, String address2, String city, String postalCode, String country, String phone) throws SQLException {
-        CountryDTO countryDTO = countryDAO.create(country, username);
-        CityDTO cityDTO = cityDAO.create(city, countryDTO.getCountryId(), username);
-        AddressDTO addressDTO = addressDAO.create(address1, address2, cityDTO.getCityId(), postalCode, phone, username);
-        CustomerDTO customerDTO = create(customerName, addressDTO.getAddressId(), true, username);
-        return new CustomerImpl(customerDTO, addressDTO, cityDTO, countryDTO);
     }
 
     private CustomerImpl getCustomer(ResultSet resultSet) throws SQLException {

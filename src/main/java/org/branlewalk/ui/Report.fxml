@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="BOTTOM_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.branlewalk.ui.ReportController">
+    <children>
+        <BarChart fx:id="reportBarChart">
+            <xAxis>
+                <CategoryAxis fx:id="categoryAxis" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis fx:id="numberAxis" side="LEFT" />
+            </yAxis>
+        </BarChart>
+      <Button onAction="#handleExitButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" text="Exit">
+         <VBox.margin>
+            <Insets bottom="20.0" right="20.0" />
+         </VBox.margin>
+      </Button>
+    </children>
+</VBox>

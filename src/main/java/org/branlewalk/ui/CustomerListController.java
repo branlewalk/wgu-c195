@@ -34,13 +34,9 @@ public class CustomerListController implements Initializable {
     private String username;
     private CustomerDAO customerDAO;
 
-    public CustomerListController() {
-        username = LoginController.username;
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        username = LoginController.username;
         nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         phoneColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPhone()));
         postalColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPostalCode()));

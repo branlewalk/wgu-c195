@@ -1,22 +1,28 @@
 package org.branlewalk.ui;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import org.branlewalk.dao.AppointmentDAO;
+import org.branlewalk.dao.AppointmentDaoImpl;
+import org.branlewalk.domain.Appointment;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.*;
 
 public class DashboardController implements Initializable {
@@ -32,6 +38,7 @@ public class DashboardController implements Initializable {
     private List<TableView<String>> monthDays;
     private List<TableView<String>> weekDays;
     private WeekDays days;
+    private boolean monthView;
 
 
     @FXML
@@ -57,12 +64,22 @@ public class DashboardController implements Initializable {
         }
         weekViewPane.setVisible(false);
         weekController.setVisible(false);
-        updateMonthView();
+        try {
+            updateMonthView();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void updateMonthView() {
+    private void updateMonthView() throws SQLException {
         monthYearLabel.setText(calendar.getDisplayName(Calendar.MONTH, Calendar.LONG_FORMAT, Locale.US) + " " +
                 calendar.get(Calendar.YEAR));
+
+        Calendar end = Calendar.getInstance();
+        end.setTime(calendar.getTime());
+        end.add(Calendar.DATE, YearMonth.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1).lengthOfMonth()-1);
+        ObservableList<Appointment> monthsAppointments = getAppointments(calendar.getTime(), end.getTime());
+
         int col;
         int firstDay = calendar.get(Calendar.DAY_OF_WEEK) - 1;
         int currentDay = 0;
@@ -88,7 +105,7 @@ public class DashboardController implements Initializable {
                     Calendar dayCalendar = Calendar.getInstance();
                     dayCalendar.setTime(calendar.getTime());
                     dayCalendar.add(Calendar.DATE, currentDay-1);
-                    populateDayView(day, String.valueOf(currentDay), dayCalendar.getTime());
+                    populateDayView(day, String.valueOf(currentDay), dayCalendar.getTime(), monthsAppointments);
                 } else {
                     day.visibleProperty().setValue(false);
                 }
@@ -97,10 +114,14 @@ public class DashboardController implements Initializable {
         }
     }
 
-    private void updateWeekView() {
+    private void updateWeekView() throws SQLException {
         weekMonthLabel.setText(days.getLabel());
 
         List<Integer> dayStrings = days.getCurrent();
+        Calendar begin = Calendar.getInstance();
+        begin.setTime(calendar.getTime());
+        begin.add(Calendar.DATE, -6);
+        ObservableList<Appointment> weeksAppointments = getAppointments(begin.getTime(), calendar.getTime());
 
         for (int col = 0; col < dayStrings.size(); col++) {
             TableView<String> day = weekDays.get(col);
@@ -109,35 +130,63 @@ public class DashboardController implements Initializable {
             Calendar dayCalendar = Calendar.getInstance();
             dayCalendar.setTime(calendar.getTime());
             dayCalendar.add(Calendar.DATE, col-6);
-            populateDayView(day, header, dayCalendar.getTime());
+            populateDayView(day, header, dayCalendar.getTime(), weeksAppointments);
         }
     }
 
-    private void populateDayView(TableView<String> day, String header, Date date) {
+    private ObservableList<Appointment> getAppointments(Date begin, Date end) throws SQLException {
+        AppointmentDAO appointmentDAO = new AppointmentDaoImpl(Main.connection(), LoginController.username);
+        return appointmentDAO.findAllForDateRange(begin, end);
+    }
+
+    private void populateDayView(TableView<String> day, String header, Date date, ObservableList<Appointment> appointmentList) throws SQLException {
         TableColumn<String, String> appointments = new TableColumn<>(header);
-        day.setPlaceholder(new Label());
+        appointments.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue()));
+
+        ObservableList<Appointment> filteredAppointments = getAppointmentsFor(appointmentList, date);
+
+        day.setItems(createAppointmentTitles(filteredAppointments));
+        if (filteredAppointments.size() == 0) {
+            day.setPlaceholder(new Label());
+        }
         appointments.prefWidthProperty().bind(day.widthProperty());
         day.getColumns().add(appointments);
         day.visibleProperty().setValue(true);
         day.onMouseClickedProperty().set(event -> {
             try {
-                newWindow2("Appointment", "Appointment.fxml", date);
-            } catch (IOException e) {
+                if(!Main.newAppointmentWindow("Appointment", "Appointment.fxml", date)) {
+                    if (weekViewPane.isVisible()) {
+                        updateWeekView();
+                    } else {
+                        updateMonthView();
+                    }
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
+
         });
     }
 
-    public static void newWindow2(String title, String view, Date date) throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
-        Parent root = loader.load();
-        AppointmentController controller = loader.getController();
-        controller.setDate(date);
-        Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(title);
-        stage.setScene(new Scene(root));
-        stage.showAndWait();
+    private ObservableList<Appointment> getAppointmentsFor(ObservableList<Appointment> appointmentList, Date date) {
+        ObservableList<Appointment> appointments = FXCollections.observableArrayList();
+        LocalDate day = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Date begin = Timestamp.valueOf(day.atStartOfDay());
+        Date end = Timestamp.valueOf(day.plusDays(1).atStartOfDay());
+        for (Appointment appointment : appointmentList) {
+            if(appointment.getStart().after(begin) && appointment.getStart().before(end)) {
+                appointments.add(appointment);
+            }
+        }
+        return appointments;
+    }
+
+    private ObservableList<String> createAppointmentTitles(ObservableList<Appointment> appointmentList) {
+        ObservableList<String> titles = FXCollections.observableArrayList();
+        for (Appointment appointment : appointmentList) {
+            titles.add(appointment.toString());
+        }
+        return titles;
     }
 
     public void handleReportingButtonAction(ActionEvent actionEvent) throws IOException {
@@ -145,17 +194,17 @@ public class DashboardController implements Initializable {
 
     }
 
-    public void handlePreviousMonthButton(ActionEvent actionEvent) {
+    public void handlePreviousMonthButton(ActionEvent actionEvent) throws SQLException {
         calendar.add(Calendar.MONTH, -1);
         updateMonthView();
     }
 
-    public void handleNextMonthButton(ActionEvent actionEvent) {
+    public void handleNextMonthButton(ActionEvent actionEvent) throws SQLException {
         calendar.add(Calendar.MONTH, +1);
         updateMonthView();
     }
 
-    public void handleMonthViewButton(ActionEvent actionEvent) {
+    public void handleMonthViewButton(ActionEvent actionEvent) throws SQLException {
         updateMonthView();
         monthViewPane.setVisible(true);
         monthController.setVisible(true);
@@ -163,19 +212,19 @@ public class DashboardController implements Initializable {
         weekController.setVisible(false);
     }
 
-    public void handleNextWeekButton(ActionEvent actionEvent) {
+    public void handleNextWeekButton(ActionEvent actionEvent) throws SQLException {
         calendar.add(Calendar.WEEK_OF_MONTH, 1);
         updateWeekView();
     }
 
 
-    public void handlePreviousWeekButton(ActionEvent actionEvent) {
+    public void handlePreviousWeekButton(ActionEvent actionEvent) throws SQLException {
         calendar.add(Calendar.WEEK_OF_MONTH, -1);
         updateWeekView();
     }
 
 
-    public void handleWeekViewButton(ActionEvent actionEvent) {
+    public void handleWeekViewButton(ActionEvent actionEvent) throws SQLException {
         updateWeekView();
         weekViewPane.setVisible(true);
         weekController.setVisible(true);

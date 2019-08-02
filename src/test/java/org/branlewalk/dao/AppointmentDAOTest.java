@@ -21,6 +21,7 @@ public class AppointmentDAOTest {
     private Connection connection;
     private String selectQuery = "SELECT appointmentId,customerId,userId,title,description,location,contact,type,url," +
             "start,end,createDate,createdBy,lastUpdateBy FROM appointment";
+    private String createdBy = "byme";
 
     @Before
     public void setup() throws ClassNotFoundException, SQLException {
@@ -42,9 +43,11 @@ public class AppointmentDAOTest {
     @Test
     public void create() throws SQLException {
         AppointmentDTO dto = createAppointment(1, "type");
-        Date createDate = getDate(1985,3,25);
         String createdBy = "byme";
-        new AppointmentDaoImpl(connection).create(dto, createdBy, createDate);
+        new AppointmentDaoImpl(connection, createdBy).create(dto.getCustomerId(), dto.getUserId(), dto.getTitle(),
+                                                             dto.getDescription(), dto.getLocation(), dto.getContact(),
+                                                             dto.getType(), dto.getUrl(), dto.getStart(),
+                                                             dto.getEnd(), createdBy);
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(selectQuery);
         assertThat(resultSet.next(), is(true));
@@ -59,7 +62,6 @@ public class AppointmentDAOTest {
         assertThat(resultSet.getString("url"), is(dto.getUrl()));
         assertThat(resultSet.getDate("start"), is(dto.getStart()));
         assertThat(resultSet.getDate("end"), is(dto.getEnd()));
-        assertThat(resultSet.getDate("createDate"), is(createDate));
         assertThat(resultSet.getString("createdBy"), is(createdBy));
         assertThat(resultSet.getString("lastUpdateBy"), is(createdBy));
         resultSet.close();
@@ -68,9 +70,12 @@ public class AppointmentDAOTest {
 
     @Test
     public void read() throws SQLException {
-        AppointmentDAO AppointmentDAO = new AppointmentDaoImpl(connection);
         AppointmentDTO dto = createAppointment(1, "type");
-        AppointmentDAO.create(dto, "byme", getDate(1985,8,2));
+        AppointmentDAO AppointmentDAO = new AppointmentDaoImpl(connection, createdBy);
+        new AppointmentDaoImpl(connection, createdBy).create(dto.getCustomerId(), dto.getUserId(), dto.getTitle(),
+                dto.getDescription(), dto.getLocation(), dto.getContact(),
+                dto.getType(), dto.getUrl(), dto.getStart(),
+                dto.getEnd(), createdBy);
         AppointmentDTO actualDTO = AppointmentDAO.read(dto.getAppointmentId());
         assertThat(actualDTO, notNullValue());
         assertThat(actualDTO.getAppointmentId(), is(dto.getAppointmentId()));
@@ -89,18 +94,21 @@ public class AppointmentDAOTest {
 
     @Test
     public void read_userNotFound() throws SQLException {
-        AppointmentDAO AppointmentDAO = new AppointmentDaoImpl(connection);
+        AppointmentDAO AppointmentDAO = new AppointmentDaoImpl(connection, createdBy);
         AppointmentDTO actualDTO = AppointmentDAO.read(33);
         assertThat(actualDTO, nullValue());
     }
 
     @Test
     public void update() throws SQLException {
-        AppointmentDAO AppointmentDAO = new AppointmentDaoImpl(connection);
         AppointmentDTO dto = createAppointment(1, "type");
-        AppointmentDAO.create(dto, "byme", getDate(2016,5,31));
-        AppointmentDTO updateDTO = new AppointmentDTO(dto.getCustomerId(),1, 1, "title", "description", "loc", "contact", "type", "url", getDate(1999,1,25 ), getDate(1999, 1,25));
-        AppointmentDAO.update( "bythem", updateDTO);
+        AppointmentDAO AppointmentDAO = new AppointmentDaoImpl(connection, createdBy);
+        new AppointmentDaoImpl(connection, createdBy).create(dto.getCustomerId(), dto.getUserId(), dto.getTitle(),
+                dto.getDescription(), dto.getLocation(), dto.getContact(),
+                dto.getType(), dto.getUrl(), dto.getStart(),
+                dto.getEnd(), createdBy);
+        AppointmentDTO updateDTO = new AppointmentDTO(dto.getCustomerId(), 1, 1, "title", "description", "loc", "contact", "type", "url", getDate(1999, 1, 25), getDate(1999, 1, 25));
+        AppointmentDAO.update("bythem", updateDTO);
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(selectQuery);
         assertThat(resultSet.next(), is(true));
@@ -122,13 +130,16 @@ public class AppointmentDAOTest {
 
     @Test
     public void delete() throws SQLException {
-        AppointmentDAO appointmentDAO = new AppointmentDaoImpl(connection);
+        AppointmentDAO appointmentDAO = new AppointmentDaoImpl(connection, createdBy);
         AppointmentDTO dto = createAppointment(1, "type");
-        appointmentDAO.create(dto,"byme", getDate(1999,12,31));
+        new AppointmentDaoImpl(connection, createdBy).create(dto.getCustomerId(), dto.getUserId(), dto.getTitle(),
+                dto.getDescription(), dto.getLocation(), dto.getContact(),
+                dto.getType(), dto.getUrl(), dto.getStart(),
+                dto.getEnd(), createdBy);
         assertThat(appointmentDAO.read(dto.getAppointmentId()), notNullValue());
         appointmentDAO.delete(dto.getAppointmentId());
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM appointment WHERE appointmentId = ?");
-        statement.setInt(1,dto.getAppointmentId());
+        statement.setInt(1, dto.getAppointmentId());
         ResultSet resultSet = statement.executeQuery();
         assertThat(resultSet.next(), is(false));
     }
@@ -142,14 +153,14 @@ public class AppointmentDAOTest {
     }
 
     private AppointmentDTO createAppointment(int appointmentId, String type) throws SQLException {
-        AppointmentDTO dto = new AppointmentDTO(appointmentId,1, 1, "title", "description", "loc", "contact", type, "url", getDate(1999,1,25 ), getDate(1999, 1,25));
+        AppointmentDTO dto = new AppointmentDTO(appointmentId, 1, 1, "title", "description", "loc", "contact", type, "url", getDate(1999, 1, 25), getDate(1999, 1, 25));
         deleteAppointment(dto);
         return dto;
     }
 
     private Date getDate(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month-1, day, 0, 0, 0);
+        calendar.set(year, month - 1, day, 0, 0, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
         return new Date(calendar.getTime().getTime());
@@ -157,14 +168,26 @@ public class AppointmentDAOTest {
 
     @Test
     public void findTypes() throws SQLException {
-        AppointmentDTO dto = createAppointment(1, "type1");;
-        AppointmentDTO dto1 = createAppointment(2, "type2");;
-        AppointmentDTO dto2 = createAppointment(3, "type2");;
+        AppointmentDTO dto = createAppointment(1, "type1");
+        ;
+        AppointmentDTO dto1 = createAppointment(2, "type2");
+        ;
+        AppointmentDTO dto2 = createAppointment(3, "type2");
+        ;
         try {
-            AppointmentDAO appointmentDAO = new AppointmentDaoImpl(connection);
-            appointmentDAO.create(dto,"byme", getDate(1999,12,31));
-            appointmentDAO.create(dto1,"byme", getDate(1999,12,31));
-            appointmentDAO.create(dto2,"byme", getDate(1999,12,31));
+            AppointmentDAO appointmentDAO = new AppointmentDaoImpl(connection, createdBy);
+            appointmentDAO.create(dto.getCustomerId(), dto.getUserId(), dto.getTitle(),
+                    dto.getDescription(), dto.getLocation(), dto.getContact(),
+                    dto.getType(), dto.getUrl(), dto.getStart(),
+                    dto.getEnd(), createdBy);
+            appointmentDAO.create(dto1.getCustomerId(), dto1.getUserId(), dto1.getTitle(),
+                    dto1.getDescription(), dto1.getLocation(), dto1.getContact(),
+                    dto1.getType(), dto1.getUrl(), dto1.getStart(),
+                    dto.getEnd(), createdBy);
+            appointmentDAO.create(dto2.getCustomerId(), dto2.getUserId(), dto2.getTitle(),
+                    dto2.getDescription(), dto2.getLocation(), dto2.getContact(),
+                    dto2.getType(), dto2.getUrl(), dto2.getStart(),
+                    dto2.getEnd(), createdBy);
             List<String> types = appointmentDAO.findTypes();
             assertThat(types, is(Arrays.asList("type1", "type2")));
         } finally {

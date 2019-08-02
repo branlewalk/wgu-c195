@@ -80,7 +80,7 @@
         <Button onAction="#handleCancelButton" text="Cancel" GridPane.columnIndex="3" GridPane.halignment="LEFT"
                 GridPane.rowIndex="17"/>
         <ComboBox fx:id="typeComboBox" prefWidth="250.0" GridPane.columnIndex="1" GridPane.columnSpan="3"
-                  GridPane.rowIndex="15">
+                  GridPane.rowIndex="15" editable="true">
             <GridPane.margin>
                 <Insets right="10.0"/>
             </GridPane.margin>

@@ -20,8 +20,8 @@
                 <Insets bottom="50.0"/>
             </VBox.margin>
         </Label>
-        <Button mnemonicParsing="false" text="Appointment Types by Month"/>
-        <Button mnemonicParsing="false" text="Schedule by Users"/>
-        <Button mnemonicParsing="false" text="Schedule by Customer"/>
+        <Button onAction="#handleAppointmentsByMonth" text="Appointment Types by Month"/>
+        <Button onAction="#handleAppointmentsByUsers" text="Schedule for Each Consultant"/>
+        <Button onAction="#handleAppointmentsByCustomers" text="Number of Appointments by Customer"/>
     </children>
 </VBox>

@@ -27,6 +27,9 @@ public interface AppointmentDAO {
 
     ObservableList<Appointment> findAllForDate(Date date) throws SQLException;
 
-
     ObservableList<Appointment> findAllForDateRange(Date beginDate, Date endDate) throws SQLException;
+
+    ObservableList<Appointment> findAllTimesForDateRange(Date beginDate, Date endDate) throws SQLException;
+
+    Appointment findByTitle(String title, Date date) throws SQLException;
 }

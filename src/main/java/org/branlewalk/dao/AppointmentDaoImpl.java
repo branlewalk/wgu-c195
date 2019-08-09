@@ -84,8 +84,8 @@ public class AppointmentDaoImpl extends DaoIdGenerator<AppointmentDTO> implement
                     resultSet.getString("contact"),
                     resultSet.getString("type"),
                     resultSet.getString("url"),
-                    resultSet.getDate("start"),
-                    resultSet.getDate("end"));
+                    resultSet.getTimestamp("start"),
+                    resultSet.getTimestamp("end"));
         }
         return null;
     }
@@ -158,6 +158,31 @@ public class AppointmentDaoImpl extends DaoIdGenerator<AppointmentDTO> implement
         return findAll(appointments, begin, end);
     }
 
+    @Override
+    public ObservableList<Appointment> findAllTimesForDateRange(Date beginDate, Date endDate) throws SQLException {
+        ObservableList<Appointment> appointments = FXCollections.observableArrayList();
+        LocalDateTime begin = beginDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime end = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return findAll(appointments, begin, end);
+    }
+
+    @Override
+    public Appointment findByTitle(String title, Date date) throws SQLException {
+        String query = "SELECT * FROM appointment WHERE title = ? AND start > ? AND start < ?";
+        LocalDate day = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDateTime begin = day.atStartOfDay();
+        LocalDateTime end = day.plusDays(1).atStartOfDay();
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, title);
+        statement.setTimestamp(2, Timestamp.valueOf(begin));
+        statement.setTimestamp(3, Timestamp.valueOf(end));
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return getAppointment(resultSet);
+        }
+        return null;
+    }
+
     private ObservableList<Appointment> findAll(ObservableList<Appointment> appointments, LocalDateTime begin, LocalDateTime end) throws SQLException {
         String query = "SELECT * FROM appointment WHERE start > ? AND start < ? ";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -181,7 +206,7 @@ public class AppointmentDaoImpl extends DaoIdGenerator<AppointmentDTO> implement
                 resultSet.getString("title"), resultSet.getString("description"),
                 resultSet.getString("location"), resultSet.getString("contact"),
                 resultSet.getString("type"), resultSet.getString("url"),
-                resultSet.getDate("start"), resultSet.getDate("end"));
+                resultSet.getTimestamp("start"), resultSet.getTimestamp("end"));
         UserDTO userDTO = userDAO.read(appointmentDTO.getUserId());
         CustomerDTO customerDTO = customerDAO.read(appointmentDTO.getCustomerId());
         AddressDTO addressDTO = addressDAO.read(customerDTO.getAddressId());

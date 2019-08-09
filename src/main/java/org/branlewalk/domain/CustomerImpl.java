@@ -43,4 +43,19 @@ public class CustomerImpl implements Customer {
     public String getCountry() {
         return countryDTO.getCountry();
     }
+
+    @Override
+    public String getAddress1() {
+        return addressDTO.getAddress();
+    }
+
+    @Override
+    public String getAddress2() {
+        return addressDTO.getAddress2();
+    }
+
+    @Override
+    public int getId() {
+        return customerDTO.getCustomerId();
+    }
 }

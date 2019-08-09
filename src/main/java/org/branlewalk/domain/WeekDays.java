@@ -1,4 +1,4 @@
-package org.branlewalk.ui;
+package org.branlewalk.domain;
 
 import java.time.YearMonth;
 import java.util.ArrayList;

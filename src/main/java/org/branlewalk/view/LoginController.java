@@ -1,9 +1,8 @@
-package org.branlewalk.ui;
+package org.branlewalk.view;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -15,12 +14,12 @@ import org.branlewalk.dao.UserDAO;
 import org.branlewalk.dao.UserDaoImpl;
 import org.branlewalk.dto.UserDTO;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -33,11 +32,13 @@ public class LoginController {
     @FXML
     private PasswordField password;
     private final UserDAO userDao;
-    private ResourceBundle bundles = ResourceBundle.getBundle("language", Locale.getDefault());
+    private ResourceBundle languageBundle;
     static String username;
 
     public LoginController() throws SQLException {
         userDao = new UserDaoImpl(Main.connection());
+        // Using bundle/resources to change languages based on system's Locale
+        languageBundle = ResourceBundle.getBundle("language", Locale.getDefault());
     }
 
     @FXML
@@ -45,12 +46,13 @@ public class LoginController {
         try {
             UserDTO userDTO = userDao.find(user.getText());
             if(userDTO == null) {
-                loginMessage.setText(user.getText() + bundles.getString("key1"));
+                loginMessage.setText(user.getText() + languageBundle.getString("not_found"));
             } else {
                 if(!userDTO.getPassword().equals(password.getText())) {
-                    loginMessage.setText(bundles.getString("key2")+ user.getText());
+                    loginMessage.setText(languageBundle.getString("wrong_pw")+ user.getText());
                 } else {
                     username = userDTO.getName();
+                    logUserLogin();
                     Parent root = FXMLLoader.load(getClass().getResource("Dashboard.fxml"));
                     Stage dashboard = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
                     dashboard.setTitle("Appoint - Dashboard");
@@ -59,7 +61,16 @@ public class LoginController {
                 }
             }
         } catch (SQLException e) {
-            loginMessage.setText(bundles.getString("key3") + user.getText() + " " + e.getMessage());
+            loginMessage.setText(languageBundle.getString("sql_error") + user.getText() + " " + e.getMessage());
+        }
+    }
+
+    private void logUserLogin() throws IOException {
+        File file = new File("userlog.txt");
+        FileWriter fw = new FileWriter(file, true);
+        try(BufferedWriter bw = new BufferedWriter(fw)) {
+            bw.write(String.format("User: %s logged in @ %s ", username, LocalDateTime.now()));
+            bw.newLine();
         }
     }
 
@@ -68,14 +79,14 @@ public class LoginController {
         try {
             UserDTO userDTO = userDao.find(user.getText());
             if(userDTO != null) {
-                loginMessage.setText(user.getText() + bundles.getString("key4"));
+                loginMessage.setText(user.getText() + languageBundle.getString("exists"));
             } else {
-                userDao.create(user.getText(), password.getText(), user.getText(), new Date(System.currentTimeMillis()));
-                loginMessage.setText(bundles.getString("key5"));
+                userDao.create(user.getText(), password.getText());
+                loginMessage.setText(languageBundle.getString("success"));
 
             }
         } catch (SQLException e) {
-            loginMessage.setText(bundles.getString("key3") + user.getText() + " " + e.getMessage());
+            loginMessage.setText(languageBundle.getString("sql_error") + user.getText() + " " + e.getMessage());
         }
     }
 

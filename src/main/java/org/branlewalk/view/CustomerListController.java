@@ -1,4 +1,4 @@
-package org.branlewalk.ui;
+package org.branlewalk.view;
 
 
 import javafx.beans.property.SimpleStringProperty;
@@ -13,7 +13,6 @@ import org.branlewalk.dao.CustomerDaoImpl;
 import org.branlewalk.domain.Customer;
 
 
-import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -50,6 +49,19 @@ public class CustomerListController implements Initializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        // Lambda expression to open a new customer window from clicking on the customer list
+        customerListTable.onMouseClickedProperty().set( event -> {
+            try {
+                if (customerListTable.getSelectionModel().isEmpty()) {
+                    handleAddButton(new ActionEvent());
+                } else {
+                    handleUpdateButton(new ActionEvent());
+                }
+        } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
 
     }
 
@@ -62,12 +74,14 @@ public class CustomerListController implements Initializable {
 
     }
 
-    public void handleUpdateButton(ActionEvent actionEvent) {
-
+    public void handleUpdateButton(ActionEvent actionEvent) throws Exception {
+        Customer customer = customerListTable.getSelectionModel().getSelectedItem();
+        Main.newCustomerWindow("Customer", "Customer.fxml", customer);
+        update();
     }
 
-    public void handleAddButton(ActionEvent actionEvent) throws IOException, SQLException {
-        Main.newWindow("Customer", "Customer.fxml");
+    public void handleAddButton(ActionEvent actionEvent) throws Exception {
+        Main.newCustomerWindow("Customer", "Customer.fxml", null);
         update();
     }
 

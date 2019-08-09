@@ -1,4 +1,4 @@
-package org.branlewalk.ui;
+package org.branlewalk.view;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -6,18 +6,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.branlewalk.domain.Appointment;
+import org.branlewalk.domain.Customer;
 
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class Main extends Application {
 
@@ -25,9 +27,11 @@ public class Main extends Application {
 
     public static void main(String[] args) throws ClassNotFoundException {
         String driver = "com.mysql.cj.jdbc.Driver";
+        TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.systemDefault()));
         Class.forName(driver);
         launch(args);
     }
+
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -55,10 +59,23 @@ public class Main extends Application {
         stage.showAndWait();
     }
 
-    public static boolean newAppointmentWindow(String title, String view, Date date) throws IOException {
+    public static void newCustomerWindow(String title, String view, Customer customer) throws Exception {
+        CustomerController controller = new CustomerController(customer);
         FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
+        loader.setController(controller);
         Parent root = loader.load();
-        AppointmentController controller = loader.getController();
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(title);
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+    }
+
+    public static boolean newAppointmentWindow(String title, String view, Date date) throws Exception {
+        AppointmentController controller = new AppointmentController(null);
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
+        loader.setController(controller);
+        Parent root = loader.load();
         controller.setDate(date);
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -68,13 +85,28 @@ public class Main extends Application {
         return controller.wasCancel();
     }
 
-    public static void newReportWindow(String title, String view, CategoryAxis xAxis, NumberAxis yAxis, XYChart.Series chartData) throws IOException {
+    public static boolean editAppointmentWindow(String title, String view, Appointment appointment) throws Exception {
+        AppointmentController controller = new AppointmentController(appointment);
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
+        loader.setController(controller);
+        Parent root = loader.load();
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(title);
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+        return controller.wasCancel();
+    }
+
+
+
+
+    public static void newReportWindow(String title, String view, String type, String data) throws Exception {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource(view));
         Parent root = loader.load();
         ReportController controller = loader.getController();
-        controller.setCategoryAxis(xAxis);
-        controller.setNumberAxis(yAxis);
-        controller.setChartData(chartData);
+        controller.setData(data);
+        controller.setTypeOfReport(type);
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle(title);

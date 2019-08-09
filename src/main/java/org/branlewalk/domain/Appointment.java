@@ -24,4 +24,15 @@ public interface Appointment {
 
     Date getEnd();
 
+    int getCustomerId();
+
+    int getUserId();
+
+    String getContact();
+
+    int getId();
+
+    String getStartDateString();
+
+    String getEndDateString();
 }

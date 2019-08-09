@@ -11,4 +11,10 @@ public interface Customer {
     String getCity();
 
     String getCountry();
+
+    String getAddress1();
+
+    String getAddress2();
+
+    int getId();
 }

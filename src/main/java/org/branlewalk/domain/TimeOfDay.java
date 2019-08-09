@@ -1,4 +1,4 @@
-package org.branlewalk.ui;
+package org.branlewalk.domain;
 
 public class TimeOfDay {
 

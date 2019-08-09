@@ -38,7 +38,7 @@ public class UserDAOTest {
         UserDTO dto = createUser();
         Date createDate = getDate(1985,3,25);
         String createdBy = "byme";
-        new UserDaoImpl(connection).create(dto.getName(), dto.getPassword() , createdBy, createDate);
+        new UserDaoImpl(connection).create(dto.getName(), dto.getPassword());
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT userId,userName,password,active,createDate,createdBy,lastUpdateBy FROM user");
         assertThat(resultSet.next(), is(true));
@@ -57,7 +57,7 @@ public class UserDAOTest {
     public void read() throws SQLException {
         UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO dto = createUser();
-        userDAO.create(dto.getName(), dto.getPassword(), "byme", getDate(1985,8,2));
+        userDAO.create(dto.getName(), dto.getPassword());
         UserDTO actualDTO = userDAO.read(dto.getId());
         assertThat(actualDTO, notNullValue());
         assertThat(actualDTO.getId(), is(dto.getId()));
@@ -78,7 +78,7 @@ public class UserDAOTest {
     public void update() throws SQLException {
         UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO dto = createUser();
-        userDAO.create(dto.getName(), dto.getPassword(), "byme", getDate(2016,5,31));
+        userDAO.create(dto.getName(), dto.getPassword());
         UserDTO updateDTO = new UserDTO(dto.getId(),"bythem", "newPW", false);
         userDAO.update( "bythem", updateDTO);
         Statement statement = connection.createStatement();
@@ -97,7 +97,7 @@ public class UserDAOTest {
     public void delete() throws SQLException {
         UserDAO userDAO = new UserDaoImpl(connection);
         UserDTO dto = createUser();
-        userDAO.create(dto.getName(), dto.getPassword(), "byme", getDate(2016,5,31));
+        userDAO.create(dto.getName(), dto.getPassword());
         assertThat(userDAO.read(dto.getId()), notNullValue());
         userDAO.delete(dto.getId());
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM user WHERE userId = ?");

@@ -86,7 +86,7 @@ public class CustomerDaoImpl extends DaoIdGenerator<CustomerDTO> implements Cust
 
     public ObservableList<Customer> findAll() throws SQLException {
         ObservableList<Customer> customers = FXCollections.observableArrayList();
-        String query = "SELECT * FROM customer WHERE active = 1";
+        String query = "SELECT * FROM customer";
         PreparedStatement statement = connection.prepareStatement(query);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {

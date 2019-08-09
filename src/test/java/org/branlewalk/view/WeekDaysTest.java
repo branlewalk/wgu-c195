@@ -1,5 +1,6 @@
-package org.branlewalk.ui;
+package org.branlewalk.view;
 
+import org.branlewalk.domain.WeekDays;
 import org.junit.Test;
 
 import java.util.Arrays;
